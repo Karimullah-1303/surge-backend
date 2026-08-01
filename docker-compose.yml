@@ -1,0 +1,48 @@
+services:
+  postgres-surge:
+    image: postgres:15-alpine
+    container_name: postgres-surge
+    environment:
+      POSTGRES_USER: surge_admin
+      POSTGRES_PASSWORD: surge_password
+      POSTGRES_DB: surge_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - surge-network
+
+  redis-surge:
+    image: redis:7-alpine
+    container_name: redis-surge
+    ports:
+      - "6379:6379"
+    command: redis-server --appendonly yes
+    volumes:
+      - redisdata:/data
+    networks:
+      - surge-network
+
+  rabbitmq-surge:
+    image: rabbitmq:3-management-alpine
+    container_name: rabbitmq-surge
+    ports:
+      - "5672:5672" #AMQP protocol port
+      - "15672:15672" #Managemein UI dashboard port
+    environment:
+      RABBITMQ_DEFAULT_USER: surge_guest
+      RABBITMQ_DEFAULT_PASS: surge_secret
+    volumes:
+      - rabbitdata:/var/lib/rabbitmq
+    networks:
+      - surge-network
+
+volumes:
+  pgdata:
+  redisdata:
+  rabbitdata:
+
+networks:
+  surge-network:
+    driver: bridge

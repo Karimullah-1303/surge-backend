@@ -1,0 +1,20 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: order-service
+
+  threads:
+    virtual:
+      enabled: true
+
+  # PostgreSQL Connection stays!
+  datasource:
+    url: jdbc:postgresql://localhost:5432/surge_db
+    username: surge_admin
+    password: surge_password
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
