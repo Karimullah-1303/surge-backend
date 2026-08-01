@@ -12,8 +12,8 @@ spring:
   # PostgreSQL Connection stays!
   datasource:
     url: jdbc:postgresql://localhost:5432/surge_db
-    username: surge_admin
-    password: surge_password
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
   jpa:
     hibernate:
       ddl-auto: update

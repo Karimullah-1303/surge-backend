@@ -37,10 +37,17 @@ public class ManualProxyController {
         Enumeration<String> headerNames = request.getHeaderNames();
         while (headerNames.hasMoreElements()) {
             String key = headerNames.nextElement();
-            // We skip content-length so RestTemplate can safely recalculate it
-            if (!key.equalsIgnoreCase("content-length")) {
+            if (!key.equalsIgnoreCase("content-length") && !key.equalsIgnoreCase("authorization")) {
                 headers.add(key, request.getHeader(key));
             }
+        }
+
+        // Extract verified Clerk User ID and inject it into the downstream request
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof org.springframework.security.oauth2.jwt.Jwt jwt) {
+            headers.add("X-User-Id", jwt.getSubject());
+            // Default role fallback, can be configured via Clerk Custom Claims later
+            headers.add("X-User-Role", "ROLE_USER");
         }
 
         HttpEntity<String> entity = new HttpEntity<>(body, headers);

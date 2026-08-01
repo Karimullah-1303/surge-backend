@@ -3,8 +3,8 @@ services:
     image: postgres:15-alpine
     container_name: postgres-surge
     environment:
-      POSTGRES_USER: surge_admin
-      POSTGRES_PASSWORD: surge_password
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: surge_db
     ports:
       - "5432:5432"
@@ -31,8 +31,8 @@ services:
       - "5672:5672" #AMQP protocol port
       - "15672:15672" #Managemein UI dashboard port
     environment:
-      RABBITMQ_DEFAULT_USER: surge_guest
-      RABBITMQ_DEFAULT_PASS: surge_secret
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     volumes:
       - rabbitdata:/var/lib/rabbitmq
     networks:

@@ -6,5 +6,17 @@ spec:
   type: pubsub.rabbitmq
   version: v1
   metadata:
-    - name: host
-      value: "amqp://surge_guest:surge_secret@localhost:5672"
+    - name: hostname
+      value: "localhost"
+    - name: port
+      value: "5672"
+    - name: username       # <-- This was the culprit!
+      secretKeyRef:
+        name: RABBITMQ_USER
+        key: RABBITMQ_USER
+    - name: password
+      secretKeyRef:
+        name: RABBITMQ_PASSWORD
+        key: RABBITMQ_PASSWORD
+auth:
+  secretStore: surge-secretstore

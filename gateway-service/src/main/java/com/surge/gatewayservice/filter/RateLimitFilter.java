@@ -1,9 +1,7 @@
 package com.surge.gatewayservice.filter;
 
-import io.github.bucket4j.Bandwidth;
 import io.github.bucket4j.Bucket;
 import io.github.bucket4j.BucketConfiguration;
-import io.github.bucket4j.Refill;
 import io.github.bucket4j.distributed.proxy.ProxyManager;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -18,7 +16,7 @@ import java.io.IOException;
 import java.time.Duration;
 
 @Component
-@Order(2) // Runs AFTER your AuthenticationFilter (which should ideally be @Order(1))
+@Order(2) // Runs AFTER your AuthenticationFilter
 public class RateLimitFilter extends OncePerRequestFilter {
 
     private final ProxyManager<byte[]> proxyManager;
@@ -30,21 +28,18 @@ public class RateLimitFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        // Skip rate limiting for auth endpoints so users can log in
-        if (request.getRequestURI().startsWith("/api/v1/auth")) {
-            filterChain.doFilter(request, response);
-            return;
+        // Fallback to IP address if unauthenticated
+        String key = request.getRemoteAddr();
+
+        // Extract the verified Clerk User ID directly from the Spring Security Context
+        org.springframework.security.core.Authentication auth = org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.getPrincipal() instanceof org.springframework.security.oauth2.jwt.Jwt jwt) {
+            key = jwt.getSubject(); // This is the unique "user_xyz123" ID from Clerk
         }
 
-        // Identify the user (fallback to IP address if unauthenticated)
-        String key = request.getHeader("X-User-Id");
-        if (key == null) {
-            key = request.getRemoteAddr();
-        }
-
-        // The Rule: 1 Request allowed per second.
+        // Modern Bucket4j 8.x+ API: Using lambda builder instead of deprecated static methods
         BucketConfiguration configuration = BucketConfiguration.builder()
-                .addLimit(Bandwidth.classic(1, Refill.intervally(1, Duration.ofSeconds(1))))
+                .addLimit(limit -> limit.capacity(1).refillIntervally(1, Duration.ofSeconds(1)))
                 .build();
 
         // Fetch or create this specific user's bucket in Redis
