@@ -14,7 +14,7 @@ public class RateLimiterConfig {
 
     @Bean
     public RedisClient redisClient() {
-        // Points to your local Docker Redis instance
+        // Points to local Docker Redis instance
         return RedisClient.create("redis://localhost:6379");
     }
 

@@ -5,12 +5,24 @@ spring:
   application:
     name: inventory-service
 
+  docker:
+    compose:
+      enabled: false
+
   # PostgreSQL Connection stays! We still want relational queries and locks.
   datasource:
     url: jdbc:postgresql://localhost:5432/surge_db
-    username: surge_admin
-    password: surge_password
+    username: ${POSTGRES_USER:}
+    password: ${POSTGRES_PASSWORD:}
   jpa:
     hibernate:
       ddl-auto: update
     show-sql: true
+
+sentry:
+  dsn: ${SENTRY_DSN:}
+  send-default-pii: true
+  # Enable sending logs to Sentry
+  logs:
+    enabled: true
+#  traces-sample-rate: 1.0

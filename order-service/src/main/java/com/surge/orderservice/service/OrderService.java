@@ -15,8 +15,7 @@ public class OrderService {
 
     private final OrderRepository orderRepository;
 
-    // The @RabbitListener annotation is gone.
-    // This is now a standard Java method that your Dapr-enabled Controller will call.
+
     public void processReservationEvent(ReservationEvent event) {
         System.out.println(">>> Message Received via Dapr! Processing order: " + event.getReservationId());
 

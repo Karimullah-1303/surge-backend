@@ -14,5 +14,18 @@ spring:
     virtual:
       enabled: true
 
+  docker:
+    compose:
+      enabled: false
+
 jwt:
-  secret: "${JWT_SECRET}"
+  secret: "${JWT_SECRET:this_is_a_dummy_key_for_local_development_purpose_only}"
+
+sentry:
+  dsn: ${SENTRY_DSN:}
+  send-default-pii: true
+  # Enable sending logs to Sentry
+  logs:
+    enabled: true
+#  traces-sample-rate: 1.0
+

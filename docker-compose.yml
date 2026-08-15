@@ -3,8 +3,8 @@ services:
     image: postgres:15-alpine
     container_name: postgres-surge
     environment:
-      POSTGRES_USER: surge_admin
-      POSTGRES_PASSWORD: surge_password
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: surge_db
     ports:
       - "5432:5432"
@@ -31,10 +31,27 @@ services:
       - "5672:5672" #AMQP protocol port
       - "15672:15672" #Managemein UI dashboard port
     environment:
-      RABBITMQ_DEFAULT_USER: surge_guest
-      RABBITMQ_DEFAULT_PASS: surge_secret
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
     volumes:
       - rabbitdata:/var/lib/rabbitmq
+    networks:
+      - surge-network
+
+
+  datadog-agent:
+    image: gcr.io/datadoghq/agent:latest
+    container_name: datadog-agent
+    environment:
+      - DD_API_KEY=${DD_API_KEY}
+      - DD_SITE=us5.datadoghq.com
+      - DD_APM_ENABLED=true
+      - DD_APM_NON_LOCAL_TRAFFIC=true
+      - DD_HOSTNAME=surge-local
+      - DD_OTLP_CONFIG_RECEIVER_PROTOCOLS_GRPC_ENDPOINT=0.0.0.0:4317
+    ports:
+      - "8126:8126"
+      - "4317:4317"
     networks:
       - surge-network
 

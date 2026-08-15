@@ -22,8 +22,7 @@ public class SecurityConfig {
                         // Open the login/auth endpoints to the public
                         .requestMatchers("/api/v1/auth/**").permitAll()
 
-                        // Allow all other requests to pass through Spring Security.
-                        // Don't worry, they will still be caught by our custom AuthenticationFilter right after this!
+                        // all other requests to pass through Spring Security, they will still be caught by our custom AuthenticationFilter right after this!
                         .anyRequest().permitAll()
                 );
 
