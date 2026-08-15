@@ -30,6 +30,16 @@ public class RateLimitFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
+        // ==========================================
+        // TEMPORARY BYPASS FOR k6 LOAD TESTING
+        // Change this to 'false' to re-enable Bucket4j Rate Limiting
+        // ==========================================
+        boolean isLoadTest = false;
+        if (isLoadTest) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // Skip rate limiting for auth endpoints so users can log in
         if (request.getRequestURI().startsWith("/api/v1/auth")) {
             filterChain.doFilter(request, response);
